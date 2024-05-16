@@ -18,6 +18,34 @@ void Interface::Update(sf::RenderWindow& window, sf::Time time)
 	// Определяем окно ImGui и необходимые флаги
 	ImGui::Begin(u8"Автор - Ошурков Никита Алексеевич, АлтГТУ им. И.И. Ползунова", NULL, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
 	
+	// Вход на сервер
+	ImGui::Text(u8"IP адрес сервера");
+	ImGui::SameLine();
+	ImGui::PushItemWidth(200);
+	ImGui::InputText("##server_ip", serverIP, IM_ARRAYSIZE(serverIP));
+	ImGui::PopItemWidth();
+
+	ImGui::SameLine();
+	ImGui::Text(u8"Порт сервера");
+	ImGui::SameLine();
+	ImGui::PushItemWidth(100);
+	ImGui::InputText("##server_port", serverPort, IM_ARRAYSIZE(serverPort));
+	ImGui::PopItemWidth();
+	ImGui::SameLine();
+
+	ImGui::SameLine();
+	ImGui::Text(u8"Имя пользователя");
+	ImGui::SameLine();
+	ImGui::PushItemWidth(300);
+	ImGui::InputText("##client_name", clientName, IM_ARRAYSIZE(clientName));
+	ImGui::PopItemWidth();
+	ImGui::SameLine();
+
+	if (ImGui::Button(u8"Подключиться", ImVec2(280, 0)))
+	{
+		isConnectDone = true;
+	}
+
 	// Вывод строк
 	ImGui::BeginChild("##child", ImVec2(0, TEXT_BOX_HEIGHT), true);
 	for (size_t iterator = 0; iterator < textBox.size(); iterator++)
@@ -60,18 +88,43 @@ void Interface::MofifyTextBoxSystemMessage(std::string receivedString)
 	std::strcat(textBox[textBox.size() - 1], "\n");
 }
 
+void Interface::SetIsInputDone(bool newIsInputDone)
+{
+	isInputDone = newIsInputDone;
+}
+
+void Interface::SetIsConnectDone(bool newIsConnectDone)
+{
+	isConnectDone = newIsConnectDone;
+}
 
 std::string Interface::GetInput()
 {
 	return input;
 }
 
-void Interface::SetIsInputDone(bool newIsInputDone)
+char* Interface::GetServerIP()
 {
-	isInputDone = newIsInputDone;
+	return serverIP;
+}
+
+unsigned short Interface::GetServerPort()
+{
+	// Сначала в unsigned long а кастим в unsigned short
+	return std::strtoul(serverPort, nullptr, 0);
+}
+
+std::string Interface::GetClientName()
+{
+	return clientName;
 }
 
 bool Interface::GetIsInputDone()
 {
 	return isInputDone;
+}
+
+bool Interface::GetIsConnectDone()
+{
+	return isConnectDone;
 }

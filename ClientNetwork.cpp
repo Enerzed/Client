@@ -3,38 +3,40 @@
 ClientNetwork::ClientNetwork(std::string name)
 {
     this->name = name;
-    systemMessage = "Client has started\n";
-    std::cout << systemMessage << std::endl;
+    systemMessages.push_back("Client has started\n");
+    std::cout << systemMessages.back() << std::endl;
     receptionThread = new std::thread(&ClientNetwork::ReceivePackets, this, &socket);
 }
 
-void ClientNetwork::Connect(const char* address, unsigned short port)
+bool ClientNetwork::Connect(const char* address, unsigned short port)
 {
     if (socket.connect(address, port) != sf::Socket::Done)
     {
-        systemMessage = "Could not connect to the server with address ";
-        systemMessage.append(address).append(":").append(std::to_string(port)).append("\n");
+        systemMessages.push_back("Could not connect to the server with address ");
+        systemMessages.back().append(address).append(":").append(std::to_string(port)).append("\n");
         isSystemMessage = true;
 
-        std::cout << systemMessage << std::endl;
+        std::cout << systemMessages.back() << std::endl;
+        return false;
     }
     else
     {
         isConnected = true;
 
-        systemMessage = "Connected to the server with address ";
-        systemMessage.append(address).append(":").append(std::to_string(port)).append("\n");
+        systemMessages.push_back("Connected to the server with address ");
+        systemMessages.back().append(address).append(":").append(std::to_string(port)).append("\n");
         isSystemMessage = true;
 
-        std::cout << systemMessage << std::endl;
+        std::cout << systemMessages.back() << std::endl;
+        return true;
     }
 }
 
 void ClientNetwork::Disconnect()
 {
-    systemMessage = "Disconnected from the server\n";
+    systemMessages.push_back("Disconnected from the server\n");
     isSystemMessage = true;
-    std::cout << systemMessage << std::endl;
+    std::cout << systemMessages.back() << std::endl;
     socket.disconnect();
 }
 
@@ -52,10 +54,11 @@ void ClientNetwork::ReceivePackets(sf::TcpSocket* socket)
             unsigned short senderPort;
 
             packet >> receivedString >> receivedName >> senderAddress >> senderPort;
-            systemMessage = "From ";
-            systemMessage.assign(receivedName).append(" with address ").append(senderAddress).append(":").append(std::to_string(senderPort)).append(" - ").append(receivedString).append("\n");
+            systemMessages.push_back("From ");
+            systemMessages.back().assign(receivedName).append(" with address ").append(senderAddress).append(":").append(std::to_string(senderPort)).append(" - ").append(receivedString).append("\n");
 
-            std::cout << systemMessage << std::endl;
+            std::cout << systemMessages.back() << std::endl;
+            systemMessages.pop_back();
             // Debug
             // isSystemMessage = true;
             isPacketRecieved = true;
@@ -67,9 +70,9 @@ void ClientNetwork::SendPacket(sf::Packet& replyPacket)
 {
     if (replyPacket.getDataSize() > 0 && socket.send(replyPacket) != sf::Socket::Done)
     {
-        systemMessage = "Could not sent packet\n";
+        systemMessages.push_back("Could not sent packet\n");
         isSystemMessage = true;
-        std::cout << systemMessage << std::endl;
+        std::cout << systemMessages.back() << std::endl;
     }
     else
         std::cout << "Sent packet" << std::endl;
@@ -89,9 +92,9 @@ void ClientNetwork::ManagePackets(std::string message)
     }
     else
     {
-        systemMessage = "Server connection is not present, message is not sent\n";
+        systemMessages.push_back("Server connection is not present, message is not sent\n");
         isSystemMessage = true;
-        std::cout << systemMessage << std::endl;
+        std::cout << systemMessages.back() << std::endl;
     }
 }
 
@@ -100,9 +103,19 @@ void ClientNetwork::Run(std::string input)
     ManagePackets(input);
 }
 
+void ClientNetwork::ClearSystemMessages()
+{
+    systemMessages.clear();
+}
+
 void ClientNetwork::SetIsPacketRecieved(bool newIsPacketRecieved)
 {
     isPacketRecieved = newIsPacketRecieved;
+}
+
+void ClientNetwork::SetName(std::string newName)
+{
+    name = newName;
 }
 
 bool ClientNetwork::GetIsPacketRecieved()
@@ -120,9 +133,9 @@ bool ClientNetwork::GetIsSystemMessage()
     return isSystemMessage;
 }
 
-std::string ClientNetwork::GetSystemMessage()
+std::vector<std::string> ClientNetwork::GetSystemMessages()
 {
-    return systemMessage;
+    return systemMessages;
 }
 
 void ClientNetwork::SetIsSystemMessage(bool newIsSystemMessage)

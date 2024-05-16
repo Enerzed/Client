@@ -6,8 +6,7 @@
 
 void Client::Run()
 {
-    ClientNetwork clientNetwork("SUPERPUPERS");
-    clientNetwork.Connect("localhost", 9010);
+    ClientNetwork clientNetwork("UNDEFINED");
 
     // Окно
     sf::RenderWindow window(sf::VideoMode(1280, 720), L"Мессенджер", sf::Style::Close);
@@ -34,17 +33,25 @@ void Client::Run()
             }
         }
         // Сеть
+        if (interface.GetIsConnectDone() == true)
+        {
+            clientNetwork.Disconnect();
+            clientNetwork.Connect(interface.GetServerIP(), interface.GetServerPort());
+            clientNetwork.SetName(interface.GetClientName());
+            interface.SetIsConnectDone(false);
+        }
         if (interface.GetIsInputDone() == true)
         {
             clientNetwork.Run(interface.GetInput());
             interface.SetIsInputDone(false);
         }
-        if (clientNetwork.GetIsSystemMessage() == true)
+        for (size_t iterator = 0; iterator < clientNetwork.GetSystemMessages().size(); iterator++)
         {
-            std::string receivedString = clientNetwork.GetSystemMessage();
+            std::string receivedString = clientNetwork.GetSystemMessages()[iterator];
             interface.MofifyTextBoxSystemMessage(receivedString);
-            clientNetwork.SetIsSystemMessage(false);
         }
+        clientNetwork.ClearSystemMessages();
+
         if (clientNetwork.GetIsPacketRecieved() == true)
         {
             std::string receivedString;
