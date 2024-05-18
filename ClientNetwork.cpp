@@ -55,7 +55,7 @@ void ClientNetwork::ReceivePackets(sf::TcpSocket* socket)
 
             packet >> receivedString >> receivedName >> senderAddress >> senderPort;
             systemMessages.push_back("From ");
-            systemMessages.back().assign(receivedName).append(" with address ").append(senderAddress).append(":").append(std::to_string(senderPort)).append(" - ").append(receivedString).append("\n");
+            systemMessages.back().append(receivedName).append(" with address ").append(senderAddress).append(":").append(std::to_string(senderPort)).append(" - ").append(receivedString).append("\n");
 
             std::cout << systemMessages.back() << std::endl;
             systemMessages.pop_back();
