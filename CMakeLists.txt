@@ -14,7 +14,7 @@ endif()
 project ("Client")
 
 # Добавьте источник в исполняемый файл этого проекта.
-add_executable (Client "Client.cpp" "Client.h" "ClientNetwork.cpp" "Interface.cpp")
+add_executable (Client "Client.cpp" "Client.h" "ClientNetwork.cpp" "ClientNetwork.hpp" "Interface.cpp" "Interface.hpp")
 
 # Если CMake версии 3.12 и новее то используем стандарт C++17
 if (CMAKE_VERSION VERSION_GREATER 3.12)

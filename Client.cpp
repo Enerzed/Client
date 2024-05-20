@@ -42,7 +42,7 @@ void Client::Run()
 
         for (size_t iterator = 0; iterator < network.GetPackets().size(); iterator++)
         {
-            size_t type;
+            unsigned short type;
             std::string name;
             std::string message;
             std::string address;

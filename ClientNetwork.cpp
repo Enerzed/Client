@@ -41,7 +41,7 @@ void ClientNetwork::Disconnect()
 void ClientNetwork::ReceivePackets(sf::TcpSocket* socket)
 {
     sf::Packet packet;
-    size_t type;
+    unsigned short type;
     std::string name;
     std::string message;
     std::string address;
