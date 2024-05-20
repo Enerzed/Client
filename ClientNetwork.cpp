@@ -1,8 +1,7 @@
 ﻿#include "ClientNetwork.hpp"
 
-ClientNetwork::ClientNetwork(std::string name)
+ClientNetwork::ClientNetwork()
 {
-    this->name = name;
     systemMessages.push_back("Client has started\n");
     std::cout << systemMessages.back() << std::endl;
     receptionThread = new std::thread(&ClientNetwork::ReceivePackets, this, &socket);
@@ -10,7 +9,7 @@ ClientNetwork::ClientNetwork(std::string name)
 
 bool ClientNetwork::Connect(const char* address, unsigned short port)
 {
-    if (socket.connect(address, port) != sf::Socket::Done)
+    if (socket.connect(address, port, sf::milliseconds(100)) != sf::Socket::Done)
     {
         systemMessages.push_back("Could not connect to the server with address ");
         systemMessages.back().append(address).append(":").append(std::to_string(port)).append("\n");
@@ -42,24 +41,36 @@ void ClientNetwork::Disconnect()
 void ClientNetwork::ReceivePackets(sf::TcpSocket* socket)
 {
     sf::Packet packet;
+    size_t type;
+    std::string name;
+    std::string message;
+    std::string address;
+    unsigned short port;
+
     while (true)
     {
         if (socket->receive(packet) == sf::Socket::Done)
         {
             packets.push_back(packet);
+            packet >> type;
+            switch (type)
+            {
+            case PACKET_TYPE_MESSAGE:
+            {
+                packet >> name >> message >> address >> port;
+                systemMessages.push_back("From ");
+                systemMessages.back().append(name).append(" with address ").append(address).append(":").append(std::to_string(port)).append(" - ").append(message).append("\n");
 
-            size_t type;
-            std::string name;
-            std::string message;
-            std::string address;
-            unsigned short port;
+                std::cout << systemMessages.back() << std::endl;
 
-            packet >> type >> name >> message >> address >> port;
-            systemMessages.push_back("From ");
-            systemMessages.back().append(name).append(" with address ").append(address).append(":").append(std::to_string(port)).append(" - ").append(message).append("\n");
-
-            std::cout << systemMessages.back() << std::endl;
-            systemMessages.pop_back();
+                systemMessages.pop_back();
+                break;
+            }
+            default:
+            {
+                packets.pop_back();
+            }
+            }
         }
     }
 }
@@ -71,8 +82,6 @@ void ClientNetwork::SendPacket(sf::Packet& packet)
         systemMessages.push_back("Could not sent packet\n");
         std::cout << systemMessages.back() << std::endl;
     }
-    else
-        std::cout << "Sent packet" << std::endl;
 }
 
 void ClientNetwork::ManagePackets(size_t type, std::string message)
@@ -82,7 +91,7 @@ void ClientNetwork::ManagePackets(size_t type, std::string message)
         if (message.length() < 1)
             return;
         sf::Packet packet;
-        packet << type << name << message;
+        packet << type  << message;
         SendPacket(packet);
     }
     else
@@ -115,16 +124,6 @@ std::vector<std::string> ClientNetwork::GetSystemMessages()
 std::vector<sf::Packet> ClientNetwork::GetPackets()
 {
     return packets;
-}
-
-void ClientNetwork::SetName(std::string newName)
-{
-    name = newName;
-}
-
-std::string ClientNetwork::GetName()
-{
-    return name;
 }
 
 bool ClientNetwork::GetIsConnected()

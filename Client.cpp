@@ -6,7 +6,7 @@
 
 void Client::Run()
 {
-    ClientNetwork clientNetwork("UNDEFINED");
+    ClientNetwork network;
 
     // Окно
     sf::RenderWindow window(sf::VideoMode(1280, 720), L"Мессенджер", sf::Style::Close);
@@ -33,14 +33,14 @@ void Client::Run()
             }
         }
         // Сеть
-        for (size_t iterator = 0; iterator < clientNetwork.GetSystemMessages().size(); iterator++)
+        for (size_t iterator = 0; iterator < network.GetSystemMessages().size(); iterator++)
         {
-            std::string receivedString = clientNetwork.GetSystemMessages()[iterator];
+            std::string receivedString = network.GetSystemMessages()[iterator];
             interface.MofifyTextBoxSystemMessage(receivedString);
         }
-        clientNetwork.ClearSystemMessages();
+        network.ClearSystemMessages();
 
-        for (size_t iterator = 0; iterator < clientNetwork.GetPackets().size(); iterator++)
+        for (size_t iterator = 0; iterator < network.GetPackets().size(); iterator++)
         {
             size_t type;
             std::string name;
@@ -48,26 +48,25 @@ void Client::Run()
             std::string address;
             unsigned short port;
 
-            clientNetwork.GetPackets()[iterator] >> type >> name >> message >> address >> port;
+            network.GetPackets()[iterator] >> type >> name >> message >> address >> port;
             interface.ModifyTextBox(message, name);
         }
-        clientNetwork.ClearPackets();
+        network.ClearPackets();
 
         if (interface.GetIsConnectDone() == true)
         {
-            if (clientNetwork.GetIsConnected())
+            if (network.GetIsConnected())
             {
-                clientNetwork.Disconnect();
+                network.Disconnect();
             }
-            clientNetwork.Connect(interface.GetServerIP(), interface.GetServerPort());
-            clientNetwork.SetName(interface.GetClientName());
-            clientNetwork.Run(PACKET_TYPE_NAME, clientNetwork.GetName());
+            network.Connect(interface.GetServerIP(), interface.GetServerPort());
+            network.Run(PACKET_TYPE_NAME, interface.GetClientName());
             interface.SetIsConnectDone(false);
         }
 
         if (interface.GetIsInputDone() == true)
         {
-            clientNetwork.Run(PACKET_TYPE_MESSAGE, interface.GetInput());
+            network.Run(PACKET_TYPE_MESSAGE, interface.GetInput());
             interface.SetIsInputDone(false);
         }
 

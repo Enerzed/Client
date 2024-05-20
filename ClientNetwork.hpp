@@ -18,10 +18,10 @@ private:
     std::vector<sf::Packet> packets;            // Пакеты
     std::vector<std::string> systemMessages;    // Различные сообщения
     std::thread* receptionThread;               // Отдельный поток для получения сообщений от кого-либо
-    std::string name;                           // Имя клиента
+    //std::string name;                           // Имя клиента
     bool isConnected = false;                   // Флаг присутствия подключения
 public:
-    ClientNetwork(std::string);
+    ClientNetwork();
     bool Connect(const char*, unsigned short);  // Подключаемся к серверу
     void Disconnect();                          // Отключаемся от сервера
     void ReceivePackets(sf::TcpSocket*);        // Получаем пакеты
@@ -31,9 +31,8 @@ public:
     void ClearPackets();
     void ClearSystemMessages();
     // Setters
-    void SetName(std::string);
+    
     // Getters
-    std::string GetName();
     std::vector<std::string> GetSystemMessages();
     std::vector<sf::Packet> GetPackets();
     bool GetIsConnected();
