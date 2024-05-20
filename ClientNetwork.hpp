@@ -1,6 +1,8 @@
 ﻿// Класс для соединения и обработки сообщений
-
 #pragma once
+
+#define PACKET_TYPE_MESSAGE 1
+#define PACKET_TYPE_NAME 2
 
 #include <iostream>
 #include <thread>
@@ -13,13 +15,10 @@ class ClientNetwork
 {
 private:
     sf::TcpSocket socket;                       // Сокет для подключения к серверу
-    sf::Packet lastPacket;                      // Пакет с последним содержимым для вывода на экранную форму
-    sf::Packet packet;                          // Пакет, в который считываются содержимое всех пакетов
-    std::thread* receptionThread;               // Отдельный поток для получения сообщений от кого-либо
+    std::vector<sf::Packet> packets;            // Пакеты
     std::vector<std::string> systemMessages;    // Различные сообщения
+    std::thread* receptionThread;               // Отдельный поток для получения сообщений от кого-либо
     std::string name;                           // Имя клиента
-    bool isSystemMessage = false;               // Если хотим отправить сообщение в основную экранную форму, то меняем флаг на true
-    bool isPacketRecieved = false;              // Если хотим показать сообщение от кого-либо на основной экранной форме, меняем флаг на true
     bool isConnected = false;                   // Флаг присутствия подключения
 public:
     ClientNetwork(std::string);
@@ -27,17 +26,15 @@ public:
     void Disconnect();                          // Отключаемся от сервера
     void ReceivePackets(sf::TcpSocket*);        // Получаем пакеты
     void SendPacket(sf::Packet&);               // Отправляем пакеты
-    void ManagePackets(std::string);            // Формируем пакеты
-    void Run(std::string input);                // Очередная итерация
+    void ManagePackets(size_t, std::string);    // Формируем пакеты
+    void Run(size_t type, std::string input);   // Очередная итерация
+    void ClearPackets();
     void ClearSystemMessages();
     // Setters
-    void SetIsPacketRecieved(bool);             
-    void SetIsSystemMessage(bool);
     void SetName(std::string);
     // Getters
-    bool GetIsPacketRecieved();
-    bool GetIsSystemMessage();
     std::string GetName();
     std::vector<std::string> GetSystemMessages();
-    sf::Packet GetLastPacket();
+    std::vector<sf::Packet> GetPackets();
+    bool GetIsConnected();
 };

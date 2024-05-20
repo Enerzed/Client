@@ -33,18 +33,6 @@ void Client::Run()
             }
         }
         // Сеть
-        if (interface.GetIsConnectDone() == true)
-        {
-            clientNetwork.Disconnect();
-            clientNetwork.Connect(interface.GetServerIP(), interface.GetServerPort());
-            clientNetwork.SetName(interface.GetClientName());
-            interface.SetIsConnectDone(false);
-        }
-        if (interface.GetIsInputDone() == true)
-        {
-            clientNetwork.Run(interface.GetInput());
-            interface.SetIsInputDone(false);
-        }
         for (size_t iterator = 0; iterator < clientNetwork.GetSystemMessages().size(); iterator++)
         {
             std::string receivedString = clientNetwork.GetSystemMessages()[iterator];
@@ -52,16 +40,37 @@ void Client::Run()
         }
         clientNetwork.ClearSystemMessages();
 
-        if (clientNetwork.GetIsPacketRecieved() == true)
+        for (size_t iterator = 0; iterator < clientNetwork.GetPackets().size(); iterator++)
         {
-            std::string receivedString;
-            std::string receivedName;
-            std::string senderAddress;
-            unsigned short senderPort;
-            clientNetwork.GetLastPacket() >> receivedString >> receivedName >> senderAddress >> senderPort;
-            interface.ModifyTextBox(receivedString, receivedName);
-            clientNetwork.SetIsPacketRecieved(false);
+            size_t type;
+            std::string name;
+            std::string message;
+            std::string address;
+            unsigned short port;
+
+            clientNetwork.GetPackets()[iterator] >> type >> name >> message >> address >> port;
+            interface.ModifyTextBox(message, name);
         }
+        clientNetwork.ClearPackets();
+
+        if (interface.GetIsConnectDone() == true)
+        {
+            if (clientNetwork.GetIsConnected())
+            {
+                clientNetwork.Disconnect();
+            }
+            clientNetwork.Connect(interface.GetServerIP(), interface.GetServerPort());
+            clientNetwork.SetName(interface.GetClientName());
+            clientNetwork.Run(PACKET_TYPE_NAME, clientNetwork.GetName());
+            interface.SetIsConnectDone(false);
+        }
+
+        if (interface.GetIsInputDone() == true)
+        {
+            clientNetwork.Run(PACKET_TYPE_MESSAGE, interface.GetInput());
+            interface.SetIsInputDone(false);
+        }
+
         // Обновляем интерфейс
         interface.Update(window, time);
         // Очищаем окно
