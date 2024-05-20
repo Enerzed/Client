@@ -17,6 +17,7 @@
 #include <imgui.h>
 
 #include <iostream>
+#include <cstring>
 
 
 class Interface
