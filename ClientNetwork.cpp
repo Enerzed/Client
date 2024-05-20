@@ -84,7 +84,7 @@ void ClientNetwork::SendPacket(sf::Packet& packet)
     }
 }
 
-void ClientNetwork::ManagePackets(size_t type, std::string message)
+void ClientNetwork::ManagePackets(unsigned short type, std::string message)
 {
     if (isConnected)
     {
@@ -101,7 +101,7 @@ void ClientNetwork::ManagePackets(size_t type, std::string message)
     }
 }
 
-void ClientNetwork::Run(size_t type, std::string message)
+void ClientNetwork::Run(unsigned short type, std::string message)
 {
     ManagePackets(type, message);
 }

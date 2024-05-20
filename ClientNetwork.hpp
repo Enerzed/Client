@@ -26,8 +26,8 @@ public:
     void Disconnect();                          // Отключаемся от сервера
     void ReceivePackets(sf::TcpSocket*);        // Получаем пакеты
     void SendPacket(sf::Packet&);               // Отправляем пакеты
-    void ManagePackets(size_t, std::string);    // Формируем пакеты
-    void Run(size_t type, std::string input);   // Очередная итерация
+    void ManagePackets(unsigned short, std::string);    // Формируем пакеты
+    void Run(unsigned short, std::string);   // Очередная итерация
     void ClearPackets();
     void ClearSystemMessages();
     // Setters
