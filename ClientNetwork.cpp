@@ -4,6 +4,8 @@ ClientNetwork::ClientNetwork()
 {
     systemMessages.push_back("Client has started\n");
     std::cout << systemMessages.back() << std::endl;
+    systemMessages.pop_back();
+
     receptionThread = new std::thread(&ClientNetwork::ReceivePackets, this, &socket);
 }
 
@@ -24,6 +26,7 @@ bool ClientNetwork::Connect(const char* address, unsigned short port)
         systemMessages.push_back("Connected to the server with address ");
         systemMessages.back().append(address).append(":").append(std::to_string(port)).append("\n");
         std::cout << systemMessages.back() << std::endl;
+        systemMessages.pop_back();
 
         return true;
     }
@@ -58,12 +61,37 @@ void ClientNetwork::ReceivePackets(sf::TcpSocket* socket)
             case PACKET_TYPE_MESSAGE:
             {
                 packet >> name >> message >> address >> port;
+
                 systemMessages.push_back("From ");
                 systemMessages.back().append(name).append(" with address ").append(address).append(":").append(std::to_string(port)).append(" - ").append(message).append("\n");
-
                 std::cout << systemMessages.back() << std::endl;
 
                 systemMessages.pop_back();
+
+                break;
+            }
+            case PACKET_TYPE_CLIENT_CONNECTED:
+            {
+                packet >> name >> address >> port;
+
+                systemMessages.push_back(name);
+                systemMessages.back().append(" has joined the server\n");
+                std::cout << systemMessages.back();
+
+                packets.pop_back();
+
+                break;
+            }
+            case PACKET_TYPE_CLIENT_DISCONNECTED:
+            {
+                packet >> name >> address >> port;
+
+                systemMessages.push_back(name);
+                systemMessages.back().append(" disconnected from the server\n");
+                std::cout << systemMessages.back();
+
+                packets.pop_back();
+
                 break;
             }
             default:

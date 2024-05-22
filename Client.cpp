@@ -60,7 +60,7 @@ void Client::Run()
                 network.Disconnect();
             }
             network.Connect(interface.GetServerIP(), interface.GetServerPort());
-            network.Run(PACKET_TYPE_NAME, interface.GetClientName());
+            network.Run(PACKET_TYPE_INITIAL_DATA, interface.GetClientName());
             interface.SetIsConnectDone(false);
         }
 

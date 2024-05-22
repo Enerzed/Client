@@ -2,7 +2,9 @@
 #pragma once
 
 #define PACKET_TYPE_MESSAGE 1
-#define PACKET_TYPE_NAME 2
+#define PACKET_TYPE_INITIAL_DATA 2
+#define PACKET_TYPE_CLIENT_CONNECTED 3
+#define PACKET_TYPE_CLIENT_DISCONNECTED 4
 
 #include <iostream>
 #include <thread>
