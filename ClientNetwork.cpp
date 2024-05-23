@@ -94,6 +94,17 @@ void ClientNetwork::ReceivePackets(sf::TcpSocket* socket)
 
                 break;
             }
+            case PACKET_TYPE_SERVER_DOWN:
+            {
+                systemMessages.push_back("Server is down\n");
+                std::cout << systemMessages.back();
+
+                isConnected = false;
+
+                packets.pop_back();
+
+                break;
+            }
             default:
             {
                 packets.pop_back();
