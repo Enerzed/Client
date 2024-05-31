@@ -1,4 +1,4 @@
-# Подключаем библиотеки статически для избежания неожиданных проблем
+п»ї# РџРѕРґРєР»СЋС‡Р°РµРј Р±РёР±Р»РёРѕС‚РµРєРё СЃС‚Р°С‚РёС‡РµСЃРєРё РґР»СЏ РёР·Р±РµР¶Р°РЅРёСЏ РЅРµРѕР¶РёРґР°РЅРЅС‹С… РїСЂРѕР±Р»РµРј
 set(BUILD_SHARED_LIBS FALSE)
 
 include(FetchContent)
@@ -27,3 +27,11 @@ FetchContent_Declare(
   GIT_TAG 82dc2033e51b8323857c3ae1cf1f458b3a933c35 # 2.3
 )
 add_subdirectory(imgui-sfml)
+
+# OpenSSL
+FetchContent_Declare(
+	openssl-cmake
+	GIT_REPOSITORY https://github.com/flagarde/openssl-cmake
+	GIT_TAG 4f4ef7ab029c3e6696c4d749ca3d0f8a137a2f82 # 2.4
+)
+add_subdirectory(openssl-cmake)

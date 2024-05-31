@@ -6,6 +6,13 @@ ClientNetwork::ClientNetwork()
     std::cout << systemMessages.back() << std::endl;
     systemMessages.pop_back();
 
+    // Генерируем ключ и вектор инициализации
+    aes.GenerateRandomKey();
+    aes.GenerateRandomIV();
+
+    //std::cout << "KEY : " << aes.GetKey() << std::endl;
+    //std::cout << "IV : " << aes.GetIV() << std::endl;
+
     receptionThread = new std::thread(&ClientNetwork::ReceivePackets, this, &socket);
 }
 
@@ -60,7 +67,7 @@ void ClientNetwork::ReceivePackets(sf::TcpSocket* socket)
             {
             case PACKET_TYPE_MESSAGE:
             {
-                packet >> name >> message >> address >> port;
+                packet >> name >> aes.Decrypt(message, aes.GetIV()) >> address >> port;
 
                 systemMessages.push_back("From ");
                 systemMessages.back().append(name).append(" with address ").append(address).append(":").append(std::to_string(port)).append(" - ").append(message).append("\n");
@@ -105,6 +112,25 @@ void ClientNetwork::ReceivePackets(sf::TcpSocket* socket)
 
                 break;
             }
+            case PACKET_TYPE_RSA_KEY:
+            {
+                systemMessages.push_back("Got RSA key\n");
+                std::cout << systemMessages.back();
+                systemMessages.pop_back();
+
+                std::string rsaKey;
+                packet >> rsaKey;
+
+                rsa.SetPublicKey(rsaKey);
+
+                // Отправляем зашифрованные с помощью RSA ключ и вектор инициализации
+                Run(PACKET_TYPE_AES_KEY, rsa.Encrypt(aes.GetKey()));
+                Run(PACKET_TYPE_AES_IV, rsa.Encrypt(aes.GetIV()));
+
+                packets.pop_back();
+
+                break;
+            }
             default:
             {
                 packets.pop_back();
@@ -130,7 +156,11 @@ void ClientNetwork::ManagePackets(unsigned short type, std::string message)
         if (message.length() < 1)
             return;
         sf::Packet packet;
-        packet << type  << message;
+
+        if (type == PACKET_TYPE_MESSAGE)
+            packet << type << aes.Encrypt(message);
+        else
+            packet << type  << message;
         SendPacket(packet);
     }
     else

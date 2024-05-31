@@ -1,8 +1,8 @@
 ﻿// Client.cpp: определяет точку входа для приложения.
 
-#pragma execution_character_set("utf-8")
 
-#include "Client.h"
+#include "Client.hpp"
+
 
 void Client::Run()
 {
@@ -84,12 +84,3 @@ void Client::Run()
 
 }
 
-int main()
-{
-    system("chcp 65001");
-
-    Client client;
-    client.Run();
-    
-    return 0;
-}

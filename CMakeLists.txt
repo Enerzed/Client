@@ -13,8 +13,13 @@ endif()
 # Имя проекта
 project ("Client")
 
+# Добавляем шрифт
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/fonts/arial.ttf DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+# Файлы проекта .hpp .cpp
+file(GLOB CLIENT_SRC "*.hpp" "*.cpp")
+
 # Добавьте источник в исполняемый файл этого проекта.
-add_executable (Client "Client.cpp" "Client.h" "ClientNetwork.cpp" "ClientNetwork.hpp" "Interface.cpp" "Interface.hpp")
+add_executable (Client ${CLIENT_SRC})
 
 # Если CMake версии 3.12 и новее то используем стандарт C++17
 if (CMAKE_VERSION VERSION_GREATER 3.12)
@@ -25,11 +30,13 @@ endif()
 set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
 set(THREADS_PREFER_PTHREAD_FLAG TRUE)
 find_package(Threads REQUIRED)
-target_link_libraries(Client PUBLIC Threads::Threads)
 
 # Подключаем зависимости
 add_subdirectory(dependencies)
 
 # Подключаем необходимые библиотеки
-target_link_libraries(Client PUBLIC ImGui-SFML::ImGui-SFML)
-target_link_libraries(Client PUBLIC sfml-network)
+target_link_libraries(${PROJECT_NAME} PUBLIC ImGui-SFML::ImGui-SFML)
+target_link_libraries(${PROJECT_NAME} PUBLIC sfml-network)
+target_link_libraries(${PROJECT_NAME} PUBLIC Threads::Threads)
+target_link_libraries(${PROJECT_NAME} PUBLIC OpenSSL::SSL)
+target_link_libraries(${PROJECT_NAME} PUBLIC OpenSSL::Crypto)

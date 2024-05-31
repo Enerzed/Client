@@ -1,6 +1,6 @@
-message(STATUS "Fetching SFML...")
+п»їmessage(STATUS "Fetching SFML...")
 
-# Делаем обязательными следующие модули
+# Р”РµР»Р°РµРј РѕР±СЏР·Р°С‚РµР»СЊРЅС‹РјРё СЃР»РµРґСѓСЋС‰РёРµ РјРѕРґСѓР»Рё
 set(SFML_BUILD_GRAPHICS TRUE)
 set(SFML_BUILD_SYSTEM TRUE)
 set(SFML_BUILD_WINDOW TRUE)
