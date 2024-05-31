@@ -2,17 +2,14 @@
 
 ClientNetwork::ClientNetwork()
 {
+    // Сообщение о старте работы клиента
     systemMessages.push_back("Client has started\n");
     std::cout << systemMessages.back() << std::endl;
     systemMessages.pop_back();
-
     // Генерируем ключ и вектор инициализации
     aes.GenerateRandomKey();
     aes.GenerateRandomIV();
-
-    //std::cout << "KEY : " << aes.GetKey() << std::endl;
-    //std::cout << "IV : " << aes.GetIV() << std::endl;
-
+    // Поток приема сообщений
     receptionThread = new std::thread(&ClientNetwork::ReceivePackets, this, &socket);
 }
 
@@ -20,30 +17,30 @@ bool ClientNetwork::Connect(const char* address, unsigned short port)
 {
     if (socket.connect(address, port, sf::milliseconds(100)) != sf::Socket::Done)
     {
+        // Сообщение о том, что были не были подключены к серверу
         systemMessages.push_back("Could not connect to the server with address ");
         systemMessages.back().append(address).append(":").append(std::to_string(port)).append("\n");
         std::cout << systemMessages.back() << std::endl;
-
         return false;
     }
     else
     {
         isConnected = true;
-
+        // Сообщение о том, что были подключены к серверу
         systemMessages.push_back("Connected to the server with address ");
         systemMessages.back().append(address).append(":").append(std::to_string(port)).append("\n");
         std::cout << systemMessages.back() << std::endl;
         systemMessages.pop_back();
-
         return true;
     }
 }
 
 void ClientNetwork::Disconnect()
 {
+    // Сообщение об отключении от сервера
     systemMessages.push_back("Disconnected from the server\n");
     std::cout << systemMessages.back() << std::endl;
-
+    // Отключаемся
     isConnected = false;
     socket.disconnect();
 }
@@ -54,86 +51,75 @@ void ClientNetwork::ReceivePackets(sf::TcpSocket* socket)
     unsigned short type;
     std::string name;
     std::string message;
-    std::string address;
-    unsigned short port;
 
+    // Бесконечный цикл для получения пакетов
     while (true)
     {
         if (socket->receive(packet) == sf::Socket::Done)
         {
-            packets.push_back(packet);
             packet >> type;
             switch (type)
             {
             case PACKET_TYPE_MESSAGE:
             {
-                packet >> name >> aes.Decrypt(message, aes.GetIV()) >> address >> port;
-
-                systemMessages.push_back("From ");
-                systemMessages.back().append(name).append(" with address ").append(address).append(":").append(std::to_string(port)).append(" - ").append(message).append("\n");
+                // Получаем содержимое пакета
+                packet >> name >> message;
+                packet.clear();
+                // Пакет с расшифрованным сообщением используется для вывода на экран
+                packet << type << name << aes.Decrypt(message, aes.GetIV());
+                packets.push_back(packet);
+                // Выводим сообщение в консоль
+                systemMessages.push_back(name);
+                systemMessages.back().append(": ").append(message).append("\n");
                 std::cout << systemMessages.back() << std::endl;
-
                 systemMessages.pop_back();
-
                 break;
             }
             case PACKET_TYPE_CLIENT_CONNECTED:
             {
-                packet >> name >> address >> port;
-
+                // Получаем имя подключившегося клиента
+                packet >> name;
+                // Сообщение о подключении клиента
                 systemMessages.push_back(name);
                 systemMessages.back().append(" has joined the server\n");
                 std::cout << systemMessages.back();
-
-                packets.pop_back();
-
                 break;
             }
             case PACKET_TYPE_CLIENT_DISCONNECTED:
             {
-                packet >> name >> address >> port;
-
+                // Получаем имя отключившегося клиента
+                packet >> name;
+                // Сообщение об отключении клиента
                 systemMessages.push_back(name);
                 systemMessages.back().append(" disconnected from the server\n");
                 std::cout << systemMessages.back();
-
-                packets.pop_back();
-
                 break;
             }
             case PACKET_TYPE_SERVER_DOWN:
             {
+                // Сообщение о отключении сервера
                 systemMessages.push_back("Server is down\n");
                 std::cout << systemMessages.back();
-
+                // Отключаемся
                 isConnected = false;
-
-                packets.pop_back();
-
+                socket->disconnect();
                 break;
             }
             case PACKET_TYPE_RSA_KEY:
             {
+                // Сообщение о получении RSA ключа
                 systemMessages.push_back("Got RSA key\n");
                 std::cout << systemMessages.back();
                 systemMessages.pop_back();
-
+                // Получаем сам ключ
                 std::string rsaKey;
                 packet >> rsaKey;
-
+                // Ставим объекту RSA полученный ключ
                 rsa.SetPublicKey(rsaKey);
-
                 // Отправляем зашифрованные с помощью RSA ключ и вектор инициализации
                 Run(PACKET_TYPE_AES_KEY, rsa.Encrypt(aes.GetKey()));
                 Run(PACKET_TYPE_AES_IV, rsa.Encrypt(aes.GetIV()));
-
-                packets.pop_back();
-
                 break;
-            }
-            default:
-            {
-                packets.pop_back();
             }
             }
         }

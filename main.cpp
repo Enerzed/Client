@@ -4,11 +4,11 @@
 
 int main()
 {
+    // Кодировка
     system("chcp 65001");
     std::cout << std::endl;
-
+    // Клиент
     Client client;
     client.Run();
-
     return 0;
 }
