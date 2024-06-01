@@ -66,10 +66,10 @@ void ClientNetwork::ReceivePackets(sf::TcpSocket* socket)
                 packet >> name >> message;
                 packet.clear();
                 // Пакет с расшифрованным сообщением используется для вывода на экран
-                packet << type << name << aes.Decrypt(message, aes.GetIV());
+                packet << type << aes.Decrypt(name, aes.GetIV()) << aes.Decrypt(message, aes.GetIV());
                 packets.push_back(packet);
                 // Выводим сообщение в консоль
-                systemMessages.push_back(name);
+                systemMessages.push_back(aes.Decrypt(name, aes.GetIV()));
                 systemMessages.back().append(": ").append(aes.Decrypt(message, aes.GetIV())).append("\n");
                 std::cout << systemMessages.back() << std::endl;
                 systemMessages.pop_back();
@@ -78,7 +78,7 @@ void ClientNetwork::ReceivePackets(sf::TcpSocket* socket)
             case PACKET_TYPE_CLIENT_NAME:
             {
                 packet >> name;
-                systemMessages.push_back(name);
+                systemMessages.push_back(aes.Decrypt(name, aes.GetIV()));
                 systemMessages.back().append(" has joined the server\n");
                 std::cout << systemMessages.back() << std::endl;
                 break;
@@ -101,7 +101,7 @@ void ClientNetwork::ReceivePackets(sf::TcpSocket* socket)
                 // Получаем имя отключившегося клиента
                 packet >> name;
                 // Сообщение об отключении клиента
-                systemMessages.push_back(name);
+                systemMessages.push_back(aes.Decrypt(name, aes.GetIV()));
                 systemMessages.back().append(" disconnected from the server\n");
                 std::cout << systemMessages.back();
                 break;
@@ -130,7 +130,9 @@ void ClientNetwork::ReceivePackets(sf::TcpSocket* socket)
                 // Отправляем зашифрованные с помощью RSA ключ и вектор инициализации
                 Run(PACKET_TYPE_AES_KEY, rsa.Encrypt(aes.GetKey()));
                 Run(PACKET_TYPE_AES_IV, rsa.Encrypt(aes.GetIV()));
-                Run(PACKET_TYPE_CLIENT_NAME, this->name);
+                // Пауза на 32 миллисекунды
+                std::this_thread::sleep_for(std::chrono::milliseconds{ 32 });
+                Run(PACKET_TYPE_CLIENT_NAME, aes.Encrypt(this->name));
                 break;
             }
             }
