@@ -70,19 +70,30 @@ void ClientNetwork::ReceivePackets(sf::TcpSocket* socket)
                 packets.push_back(packet);
                 // Выводим сообщение в консоль
                 systemMessages.push_back(name);
-                systemMessages.back().append(": ").append(message).append("\n");
+                systemMessages.back().append(": ").append(aes.Decrypt(message, aes.GetIV())).append("\n");
                 std::cout << systemMessages.back() << std::endl;
                 systemMessages.pop_back();
                 break;
             }
-            case PACKET_TYPE_CLIENT_CONNECTED:
+            case PACKET_TYPE_CLIENT_NAME:
             {
-                // Получаем имя подключившегося клиента
                 packet >> name;
-                // Сообщение о подключении клиента
                 systemMessages.push_back(name);
                 systemMessages.back().append(" has joined the server\n");
-                std::cout << systemMessages.back();
+                std::cout << systemMessages.back() << std::endl;
+                break;
+            }
+            case PACKET_TYPE_CLIENT_CONNECTED:
+            {
+                // Получаем адрес и порт подключившегося клиента
+                std::string address;
+                unsigned short port;
+                packet >> address >> port;
+                // Сообщение о подключении клиента с адресом и портом
+                systemMessages.push_back(address);
+                systemMessages.back().append(":").append(std::to_string(port)).append(" has joined the server\n");
+                std::cout << systemMessages.back() << std::endl;
+                systemMessages.pop_back();
                 break;
             }
             case PACKET_TYPE_CLIENT_DISCONNECTED:
@@ -109,7 +120,7 @@ void ClientNetwork::ReceivePackets(sf::TcpSocket* socket)
             {
                 // Сообщение о получении RSA ключа
                 systemMessages.push_back("Got RSA key\n");
-                std::cout << systemMessages.back();
+                std::cout << systemMessages.back() << std::endl;
                 systemMessages.pop_back();
                 // Получаем сам ключ
                 std::string rsaKey;
@@ -119,6 +130,7 @@ void ClientNetwork::ReceivePackets(sf::TcpSocket* socket)
                 // Отправляем зашифрованные с помощью RSA ключ и вектор инициализации
                 Run(PACKET_TYPE_AES_KEY, rsa.Encrypt(aes.GetKey()));
                 Run(PACKET_TYPE_AES_IV, rsa.Encrypt(aes.GetIV()));
+                Run(PACKET_TYPE_CLIENT_NAME, this->name);
                 break;
             }
             }
@@ -169,6 +181,11 @@ void ClientNetwork::ClearSystemMessages()
 void ClientNetwork::ClearPackets()
 {
     packets.clear();
+}
+
+void ClientNetwork::SetName(std::string newName)
+{
+    name = newName;
 }
 
 std::vector<std::string> ClientNetwork::GetSystemMessages()

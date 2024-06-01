@@ -2,7 +2,7 @@
 #pragma once
 
 #define PACKET_TYPE_MESSAGE 1
-#define PACKET_TYPE_INITIAL_DATA 2
+#define PACKET_TYPE_CLIENT_NAME 2
 #define PACKET_TYPE_CLIENT_CONNECTED 3
 #define PACKET_TYPE_CLIENT_DISCONNECTED 4
 #define PACKET_TYPE_SERVER_DOWN 5
@@ -25,7 +25,7 @@ private:
     std::vector<sf::Packet> packets;                    // Пакеты
     std::vector<std::string> systemMessages;            // Различные сообщения
     std::thread* receptionThread;                       // Отдельный поток для получения сообщений от кого-либо
-    //std::string name;                                 // Имя клиента
+    std::string name;                                   // Имя клиента
     bool isConnected = false;                           // Флаг присутствия подключения
 
     RSAEncryption rsa;
@@ -42,7 +42,7 @@ public:
     void ClearPackets();
     void ClearSystemMessages();
     // Setters
-    
+    void SetName(std::string);
     // Getters
     std::vector<std::string> GetSystemMessages();
     std::vector<sf::Packet> GetPackets();

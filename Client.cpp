@@ -97,7 +97,11 @@ void Client::RunConnect()
             network->Disconnect();
         }
         network->Connect(interface->GetServerIP(), interface->GetServerPort());
-        network->Run(PACKET_TYPE_INITIAL_DATA, interface->GetClientName());
+        if (network->GetIsConnected() == true)
+        {
+            network->SetName(interface->GetClientName());
+            network->Run(PACKET_TYPE_CLIENT_CONNECTED, "Setting up encryption\n");
+        }
         interface->SetIsConnectDone(false);
     }
 }
