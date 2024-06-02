@@ -97,6 +97,8 @@ void Client::RunConnect()
             network->Disconnect();
         }
         network->Connect(interface->GetServerIP(), interface->GetServerPort());
+        // Пауза на 32 миллисекунды
+        std::this_thread::sleep_for(std::chrono::milliseconds{ 32 });
         if (network->GetIsConnected() == true)
         {
             network->SetName(interface->GetClientName());

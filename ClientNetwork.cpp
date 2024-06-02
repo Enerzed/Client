@@ -40,6 +40,7 @@ void ClientNetwork::Disconnect()
     // Сообщение об отключении от сервера
     systemMessages.push_back("Disconnected from the server\n");
     std::cout << systemMessages.back() << std::endl;
+    systemMessages.pop_back();
     // Отключаемся
     isConnected = false;
     socket.disconnect();
@@ -129,9 +130,11 @@ void ClientNetwork::ReceivePackets(sf::TcpSocket* socket)
                 rsa.SetPublicKey(rsaKey);
                 // Отправляем зашифрованные с помощью RSA ключ и вектор инициализации
                 Run(PACKET_TYPE_AES_KEY, rsa.Encrypt(aes.GetKey()));
+                // Пауза на 32 миллисекунды
+                std::this_thread::sleep_for(std::chrono::milliseconds{ 64 });
                 Run(PACKET_TYPE_AES_IV, rsa.Encrypt(aes.GetIV()));
                 // Пауза на 32 миллисекунды
-                std::this_thread::sleep_for(std::chrono::milliseconds{ 32 });
+                std::this_thread::sleep_for(std::chrono::milliseconds{ 64 });
                 Run(PACKET_TYPE_CLIENT_NAME, aes.Encrypt(this->name));
                 break;
             }
