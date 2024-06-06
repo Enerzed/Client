@@ -23,5 +23,5 @@ public:
 	void RunSystemMessages();			// Обработка системных сообщений
 	void RunPackets();					// Обработка полученных пакетов
 	void RunConnect();					// Обработка подключения к серверу
-	void Client::RunInterface()			// Обработка интерфейса
+	void Client::RunInterface();		// Обработка интерфейса
 };
