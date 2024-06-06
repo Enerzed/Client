@@ -8,8 +8,7 @@
 #define TEXT_BOX_SIZE 256
 #define TEXT_BOX_HEIGHT 580
 #define TEXT_BOX_MESSAGE_LIMIT 128
-// Debug
-// #define textBoxSize 2048
+
 
 #include <SFML/Graphics.hpp>
 
