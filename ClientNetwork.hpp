@@ -27,24 +27,23 @@ private:
     std::thread* receptionThread;                       // Отдельный поток для получения сообщений от кого-либо
     std::string name;                                   // Имя клиента
     bool isConnected = false;                           // Флаг присутствия подключения
-
-    RSAEncryption rsa;
-    AESEncryption aes;
+    RSAEncryption rsa;                                  // Объект класса RSAEncryption для соответственного шифрования
+    AESEncryption aes;                                  // Объект класса AESEncryption для соответственного шифрования
 
 public:
-    ClientNetwork();
+    ClientNetwork();                                    // Конструктор класса, начало чата, генерируем AES ключ и вектор инициализации
     bool Connect(const char*, unsigned short);          // Подключаемся к серверу
     void Disconnect();                                  // Отключаемся от сервера
     void ReceivePackets(sf::TcpSocket*);                // Получаем пакеты
     void SendPacket(sf::Packet&);                       // Отправляем пакеты
     void ManagePackets(unsigned short, std::string);    // Формируем пакеты
     void Run(unsigned short, std::string);              // Очередная итерация
-    void ClearPackets();
-    void ClearSystemMessages();
+    void ClearPackets();                                // Очистка пакетов
+    void ClearSystemMessages();                         // Очистка системных сообщений
     // Setters
-    void SetName(std::string);
+    void SetName(std::string);                          // Установка имени клиента
     // Getters
-    std::vector<std::string> GetSystemMessages();
-    std::vector<sf::Packet> GetPackets();
-    bool GetIsConnected();
+    std::vector<std::string> GetSystemMessages();       // Получение системных сообщений
+    std::vector<sf::Packet> GetPackets();               // Получение пакетов
+    bool GetIsConnected();                              // Есть ли подключение к серверу, если нет, то и смысла отсылать пакеты нет
 };

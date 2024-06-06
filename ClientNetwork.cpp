@@ -67,11 +67,11 @@ void ClientNetwork::ReceivePackets(sf::TcpSocket* socket)
                 packet >> name >> message;
                 packet.clear();
                 // Пакет с расшифрованным сообщением используется для вывода на экран
-                packet << type << aes.Decrypt(name, aes.GetIV()) << aes.Decrypt(message, aes.GetIV());
+                packet << type << aes.Decrypt(name) << aes.Decrypt(message);
                 packets.push_back(packet);
                 // Выводим сообщение в консоль
-                systemMessages.push_back(aes.Decrypt(name, aes.GetIV()));
-                systemMessages.back().append(": ").append(aes.Decrypt(message, aes.GetIV())).append("\n");
+                systemMessages.push_back(aes.Decrypt(name));
+                systemMessages.back().append(": ").append(aes.Decrypt(message)).append("\n");
                 std::cout << systemMessages.back() << std::endl;
                 systemMessages.pop_back();
                 break;
@@ -79,7 +79,7 @@ void ClientNetwork::ReceivePackets(sf::TcpSocket* socket)
             case PACKET_TYPE_CLIENT_NAME:
             {
                 packet >> name;
-                systemMessages.push_back(aes.Decrypt(name, aes.GetIV()));
+                systemMessages.push_back(aes.Decrypt(name));
                 systemMessages.back().append(" has joined the server\n");
                 std::cout << systemMessages.back() << std::endl;
                 break;
@@ -102,7 +102,7 @@ void ClientNetwork::ReceivePackets(sf::TcpSocket* socket)
                 // Получаем имя отключившегося клиента
                 packet >> name;
                 // Сообщение об отключении клиента
-                systemMessages.push_back(aes.Decrypt(name, aes.GetIV()));
+                systemMessages.push_back(aes.Decrypt(name));
                 systemMessages.back().append(" disconnected from the server\n");
                 std::cout << systemMessages.back();
                 break;

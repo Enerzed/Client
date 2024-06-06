@@ -1,7 +1,4 @@
-﻿// Client.cpp: определяет точку входа для приложения.
-
-
-#include "Client.hpp"
+﻿#include "Client.hpp"
 
 Client::Client()
 {

@@ -13,7 +13,7 @@ endif()
 # Имя проекта
 project ("Client")
 
-# Добавляем шрифт
+# Добавляем шрифт, на MacOS надо будет в корневую папку шрифт закинуть самостоятельно или придется только из терминала открывать
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/fonts/arial.ttf DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 # Файлы проекта .hpp .cpp
 file(GLOB CLIENT_SRC "*.hpp" "*.cpp")
