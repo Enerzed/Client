@@ -23,27 +23,27 @@
 class Interface
 {
 private:
-	std::vector<char*> textBox;
-	char inputBuffer[INPUT_SIZE] = { 0 };
-	char input[INPUT_SIZE] = { 0 };
-	char serverIP[IP_SIZE] = { 0 };
-	char serverPort[PORT_SIZE] = { 0 };
-	char clientName[CLIENT_NAME_SIZE] = { 0 };
-	bool isInputDone = false;
-	bool isConnectDone = false;
+	std::vector<char*> textBox;						// Поле чата
+	char inputBuffer[INPUT_SIZE] = { 0 };			// Буффер ввода
+	char input[INPUT_SIZE] = { 0 };					// То что было введено окончательно
+	char serverIP[IP_SIZE] = { 0 };					// Введенное IP сервера
+	char serverPort[PORT_SIZE] = { 0 };				// Введенный порт для подключение
+	char clientName[CLIENT_NAME_SIZE] = { 0 };		// Имя клиента, которое было выбрано при подключении
+	bool isInputDone = false;						// Флаг введен ли текст (нажат Enter)
+	bool isConnectDone = false;						// Была ли нажата кнопка подключения
 public:
-	void Init(sf::RenderWindow&);
-	void Update(sf::RenderWindow&, sf::Time);
-	void ModifyTextBox(std::string, std::string);
-	void MofifyTextBoxSystemMessage(std::string);
-	std::string GetInput();
+	void Init(sf::RenderWindow&);					// Инициализация интерфейса и поддержки кириллицы
+	void Update(sf::RenderWindow&, sf::Time);		// Функция обновления для управления
+	void ModifyTextBox(std::string, std::string);	// Получаем сообщения и загружаем их textBox
+	void MofifyTextBoxSystemMessage(std::string);	// Уведомления системы
 	// Setters
-	void SetIsInputDone(bool);
-	void SetIsConnectDone(bool);
+	void SetIsInputDone(bool);						// Установка флага введен ли текст
+	void SetIsConnectDone(bool);					// Установка флага нажата ли была кнопка подключения
 	// Getters
-	bool GetIsInputDone();
-	bool GetIsConnectDone();
-	char* GetServerIP();
-	unsigned short GetServerPort();
-	std::string GetClientName();
+	std::string GetInput();							// Получение введенного текста
+	bool GetIsInputDone();							// Получение флага введен ли был текст (нажат Enter)
+	bool GetIsConnectDone();						// Получение флага нажали ли была кнопка подключения
+	char* GetServerIP();							// Получение IP сервера для подключения
+	unsigned short GetServerPort();					// Получение порта сервера для подключения
+	std::string GetClientName();					// Получение введенного имени
 };

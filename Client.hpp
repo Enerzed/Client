@@ -11,15 +11,17 @@
 class Client
 {
 private:
-	sf::RenderWindow* window;
-	ClientNetwork* network;
-	Interface* interface;
-	unsigned short port;
+	sf::RenderWindow* window;			// Основное окно программы
+	sf::Time* time;						// Время SFML
+	ClientNetwork* network;				// Сеть клиента
+	Interface* interface;				// Интерфейс
+	unsigned short port;				// Порт для подключения к серверу
 public:
-	Client();
-	void Run();
-	void RunNetwork();
-	void RunSystemMessages();
-	void RunPackets();
-	void RunConnect();
+	Client();							// Инициализация окна времени и другого
+	void Run();							// Основной цикл
+	void RunNetwork();					// Обработка чата
+	void RunSystemMessages();			// Обработка системных сообщений
+	void RunPackets();					// Обработка полученных пакетов
+	void RunConnect();					// Обработка подключения к серверу
+	void Client::RunInterface()			// Обработка интерфейса
 };

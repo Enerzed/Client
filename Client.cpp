@@ -5,6 +5,7 @@ Client::Client()
     // Инициализируем окно интерфейс и сеть
     window = new sf::RenderWindow(sf::VideoMode(1280, 720), L"Мессенджер", sf::Style::Close);
     window->setFramerateLimit(120);
+    time = new sf::Time();
     interface = new Interface();
     interface->Init(*window);
     network = new ClientNetwork();
@@ -17,7 +18,7 @@ void Client::Run()
     // Основной цикл
     while (window->isOpen())
     {
-        sf::Time time = clock.getElapsedTime();
+        *time = clock.getElapsedTime();
         clock.restart();
         // Обработка событий
         sf::Event event;
@@ -39,7 +40,7 @@ void Client::Run()
         // Обработка подключения
         RunConnect();
         // Обновляем интерфейс
-        interface->Update(*window, time);
+        RunInterface();
         // Очищаем окно
         window->clear();
         // Render интерфейса должен быть перед показом его на экране для того, чтобы он был на первом плане
@@ -103,4 +104,9 @@ void Client::RunConnect()
         }
         interface->SetIsConnectDone(false);
     }
+}
+
+void Client::RunInterface()
+{
+    interface->Update(*window, *time);
 }
