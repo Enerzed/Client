@@ -130,10 +130,10 @@ void ClientNetwork::ReceivePackets(sf::TcpSocket* socket)
                 rsa.SetPublicKey(rsaKey);
                 // Отправляем зашифрованные с помощью RSA ключ и вектор инициализации
                 Run(PACKET_TYPE_AES_KEY, rsa.Encrypt(aes.GetKey()));
-                // Пауза на 32 миллисекунды
+                // Пауза на 64 миллисекунды
                 std::this_thread::sleep_for(std::chrono::milliseconds{ 64 });
                 Run(PACKET_TYPE_AES_IV, rsa.Encrypt(aes.GetIV()));
-                // Пауза на 32 миллисекунды
+                // Пауза на 64 миллисекунды
                 std::this_thread::sleep_for(std::chrono::milliseconds{ 64 });
                 Run(PACKET_TYPE_CLIENT_NAME, aes.Encrypt(this->name));
                 break;
