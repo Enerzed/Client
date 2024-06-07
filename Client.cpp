@@ -93,6 +93,8 @@ void Client::RunConnect()
         if (network->GetIsConnected())
         {
             network->Disconnect();
+            // Пауза на 64 миллисекунды
+            std::this_thread::sleep_for(std::chrono::milliseconds{ 64 });
         }
         network->Connect(interface->GetServerIP(), interface->GetServerPort());
         // Пауза на 32 миллисекунды
